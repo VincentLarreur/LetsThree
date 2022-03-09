@@ -15,7 +15,7 @@ You can check out my differents steps using the tags !
 </div>
 
 
-## Step 2 - Typescript & character controls
+## Step 2 - Typescript & character controls v0.1.0
 
 <div align="center">
   <img src="https://user-images.githubusercontent.com/57709433/157453981-fdc2e4a7-614e-4fb8-92a0-a1de2c626177.gif"/>
