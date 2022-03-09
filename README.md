@@ -7,7 +7,7 @@ First steps in the Three.js and 3D world.
 You can check out my differents steps using the tags !
 </div>
 
-## Step 1 - First Scene v0.0.1
+## Step 1 - First Scene ![Version](https://img.shields.io/badge/version-0.0.1-yellow)
 
 <div align="center">
   <img src="https://user-images.githubusercontent.com/57709433/156774369-8be454e2-d0ae-4836-9389-7627252c76ea.gif"/>
@@ -15,7 +15,7 @@ You can check out my differents steps using the tags !
 </div>
 
 
-## Step 2 - Typescript & character controls v0.1.0
+## Step 2 - Typescript & character controls ![Version](https://img.shields.io/badge/version-0.1.0-yellow)
 
 <div align="center">
   <img src="https://user-images.githubusercontent.com/57709433/157453981-fdc2e4a7-614e-4fb8-92a0-a1de2c626177.gif"/>
