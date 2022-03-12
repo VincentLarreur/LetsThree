@@ -24,7 +24,6 @@ export class CharacterControls {
 
     // state
     toggleRun: boolean = true
-    jumpState: number = 0 // 0 onTheGround 1 ascendant 2 descendant
     playingOnce: boolean = false
     currentAction: string
     
@@ -33,18 +32,21 @@ export class CharacterControls {
     rotateAngle = new THREE.Vector3(0, 1, 0)
     rotateQuarternion: THREE.Quaternion = new THREE.Quaternion()
     cameraTarget = new THREE.Vector3()
+    raycaster = new THREE.Raycaster()
+    objects: THREE.Object3D[] = []
+    jumpHigh: number = 0
     
     // constants
     fadeDuration: number = 0.2
-    runVelocity = 15
-    walkVelocity = 5
-    jumpVelocity = 150
+    runVelocity = 20
+    walkVelocity = 10
+    jumpVelocity = 5
     jumpHeight = 8
 
     constructor(model: THREE.Group,
         mixer: THREE.AnimationMixer, animationsMap: Map<string, THREE.AnimationAction>,
         orbitControl: OrbitControls, camera: THREE.Camera,
-        currentAction: string) {
+        currentAction: string, objects: THREE.Object3D[]) {
         this.model = model
         this.mixer = mixer
         this.animationsMap = animationsMap
@@ -56,6 +58,10 @@ export class CharacterControls {
         })
         this.orbitControl = orbitControl
         this.camera = camera
+        this.objects = objects
+        this.raycaster.set(new THREE.Vector3(), new THREE.Vector3( 0, 0.5, 0 ))
+        this.raycaster.near = 0
+        this.raycaster.far = 2
         this.updateCameraTarget(0, 0, 0)
     }
 
@@ -69,13 +75,32 @@ export class CharacterControls {
 
     public update(delta: number, keysPressed: any) {
         const directionPressed = DIRECTIONS.some(key => keysPressed[key] == true)
+        let moveY = 0
+        let moveX = 0
+        let moveZ = 0
+
+        this.raycaster.ray.origin.copy( this.model.position )
+        this.raycaster.ray.origin.y -= 0.1;
+        const intersections = this.raycaster.intersectObjects( this.objects, false )
+        const onObject = intersections.length > 0
+        if (!onObject) {
+          if (this.model.position.y < -40) {
+            this.model.position.x = 0
+            this.model.position.y = 10
+            this.model.position.z = 0
+            this.camera.position.y = 14
+            this.camera.position.z = 25
+            this.camera.position.x = 0
+          }
+          if (this.jumpHigh === 0) {
+            moveY -= 20 * delta // GRAVITY
+          }
+        }
 
         var play = '';
-        if (keysPressed[' ']) {
+        if (keysPressed[' '] && this.jumpHigh == 0 && this.currentAction != 'Jump' && onObject) {
           play = 'Jump'
-          if (this.jumpState == 0) {
-            this.jumpState = 1
-          }
+          this.jumpHigh = this.jumpHeight
         } else if (keysPressed['&']) {
           play = 'Wave'
         } else if (keysPressed['é']) {
@@ -116,7 +141,7 @@ export class CharacterControls {
 
         this.mixer.update(delta)
 
-        if (!ANIMATIONPLAYONCE.includes(this.currentAction) && (directionPressed || this.jumpState != 0)) {
+        if (!ANIMATIONPLAYONCE.includes(this.currentAction) && (directionPressed || this.jumpHigh > 0)) {
             // calculate towards camera direction
             var angleYCameraDirection = Math.atan2(
                     (this.camera.position.x - this.model.position.x), 
@@ -133,49 +158,30 @@ export class CharacterControls {
             this.walkDirection.normalize()
             this.walkDirection.applyAxisAngle(this.rotateAngle, directionOffset)
 
-            let moveY = 0
-
-            if (this.jumpState != 0) {
-              const velocity = (this.model.position.y > 3) ? this.jumpVelocity / this.model.position.y : 30
-              if (this.jumpState == 1) {
-                if (this.model.position.y > this.jumpHeight) {
-                  this.jumpState = 2
-                } else {
-                  moveY += velocity * delta
-                }
-              } else if (this.jumpState == 2) {
-                if (this.model.position.y <= 0) {
-                  this.jumpState = 0
-                } else {
-                  moveY -= velocity * delta
-                  if ((this.model.position.y + moveY) <= 0) {
-                    moveY = -(this.model.position.y)
-                  }
-                }
-              }
+            if (this.jumpHigh > 0) {
+              const velocity = (this.jumpHigh > 3) ? this.jumpHigh * this.jumpVelocity : 30
+              moveY = velocity * delta
+              this.jumpHigh = ((this.jumpHigh - moveY) <= 0) ? 0 : (this.jumpHigh - moveY)
             }
-
-            let moveX = 0
-            let moveZ = 0
+            
             if (directionPressed) {
-              // run/walk velocity
-              const velocity = this.currentAction == 'Running' ? this.runVelocity : this.walkVelocity
+              let directionVelocity = this.currentAction == 'Running' ? this.runVelocity : this.walkVelocity
               // move model & camera
-              moveX = this.walkDirection.x * velocity * delta
-              moveZ = this.walkDirection.z * velocity * delta
+              moveX = this.walkDirection.x * directionVelocity * delta
+              moveZ = this.walkDirection.z * directionVelocity * delta
             }
 
             this.model.position.x += moveX
-            this.model.position.y += moveY
             this.model.position.z += moveZ
-            this.updateCameraTarget(moveX, moveY, moveZ)
         }
+        this.model.position.y += moveY
+        this.updateCameraTarget(moveX, moveY, moveZ)
     }
 
     private updateCameraTarget(moveX: number, moveY: number, moveZ: number) {
         // move camera
         this.camera.position.x += moveX
-        this.camera.position.y += moveY
+        this.camera.position.y += (moveY/3)
         this.camera.position.z += moveZ
 
         // update camera target

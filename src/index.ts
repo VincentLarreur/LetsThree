@@ -44,26 +44,28 @@ generateFloor()
 
 // MODEL WITH ANIMATIONS
 var characterControls: CharacterControls
+let objects: THREE.Object3D[] = []
 new GLTFLoader().load('assets/models/Robot.glb', function (gltf) {
-    const model = gltf.scene;
-    model.traverse(function(obj) {
-      obj.frustumCulled = false;
-      // @ts-ignore
-      if (obj.isMesh) {
-        obj.castShadow = true;
-        obj.receiveShadow = true;
-      }
-    });
-    scene.add(model);
+  const model = gltf.scene
+  model.traverse(function(obj) {
+    obj.frustumCulled = false
+    // @ts-ignore
+    if (obj.isMesh) {
+      obj.castShadow = true
+      obj.receiveShadow = true
+    }
+  });
+  model.position.y = 25
+  scene.add(model)
 
-    const gltfAnimations: THREE.AnimationClip[] = gltf.animations;
-    const mixer = new THREE.AnimationMixer(model);
-    const animationsMap: Map<string, THREE.AnimationAction> = new Map()
-    gltfAnimations.forEach((a: THREE.AnimationClip) => {
-        animationsMap.set(a.name, mixer.clipAction(a))
-    })
+  const gltfAnimations: THREE.AnimationClip[] = gltf.animations;
+  const mixer = new THREE.AnimationMixer(model);
+  const animationsMap: Map<string, THREE.AnimationAction> = new Map()
+  gltfAnimations.forEach((a: THREE.AnimationClip) => {
+      animationsMap.set(a.name, mixer.clipAction(a))
+  })
 
-    characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera,  'Idle')
+  characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera,  'Idle', objects)
 });
 
 // CONTROL KEYS
@@ -103,21 +105,19 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize);
 
 function generateFloor() {
-  const textureLoader = new THREE.TextureLoader();
-  const grass = textureLoader.load("../assets/grass.jpeg");
-  grass.wrapS = grass.wrapT = THREE.RepeatWrapping;
-  grass.repeat.set( 100, 100 );
-  grass.encoding = THREE.sRGBEncoding;
-
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(1000, 1000),
-    new THREE.MeshStandardMaterial({
-      map: grass,
-    }));
-  plane.castShadow = false;
-  plane.receiveShadow = true;
-  plane.rotation.x = -Math.PI / 2;
-  scene.add(plane);
+  new GLTFLoader().load('assets/models/level.glb', function (gltf) {
+    const model = gltf.scene;
+    model.traverse(function(obj) {
+      obj.frustumCulled = false;
+      // @ts-ignore
+      if (obj.isMesh) {
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
+      objects.push(obj)
+    });
+    scene.add(model);
+  });
 
   const sky = new Sky();
   sky.scale.setScalar( 450000 );
@@ -150,9 +150,9 @@ function generateFloor() {
 }
 
 function light() {
-  scene.add(new THREE.AmbientLight(0xffffff, 0.8))
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4))
 
-  let light = new THREE.DirectionalLight(0xFFFFFF, 0.8);
+  let light = new THREE.DirectionalLight(0xFFFFFF, 1);
   light.position.set(-100, 100, 100);
   light.target.position.set(0, 0, 0);
   light.castShadow = true;
