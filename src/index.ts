@@ -55,7 +55,7 @@ new GLTFLoader().load('assets/models/Robot.glb', function (gltf) {
       obj.receiveShadow = true
     }
   });
-  model.position.y = 25
+  model.position.y = 1
   scene.add(model)
 
   const gltfAnimations: THREE.AnimationClip[] = gltf.animations;
@@ -71,6 +71,12 @@ new GLTFLoader().load('assets/models/Robot.glb', function (gltf) {
 // CONTROL KEYS
 const keysPressed = {  }
 document.addEventListener('keydown', (event) => {
+    if (event.key == 'Enter') {
+      characterControls.unlock()
+      return;
+    } else if (event.key == 'Escape') {
+      characterControls.lock()
+    }
     if (event.shiftKey && characterControls) {
         characterControls.switchRunToggle()
     } else {

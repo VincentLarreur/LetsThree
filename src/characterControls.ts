@@ -23,6 +23,7 @@ export class CharacterControls {
     camera: THREE.Camera
 
     // state
+    lockState: boolean = true
     toggleRun: boolean = true
     playingOnce: boolean = false
     currentAction: string
@@ -69,11 +70,25 @@ export class CharacterControls {
         this.toggleRun = !this.toggleRun
     }
 
+    blocker: HTMLElement = document.getElementById( 'blocker' );
+
+    public lock() {
+      this.lockState = true
+      this.blocker.style.display = 'block';
+    }
+
+    public unlock() {
+      this.lockState = false
+      this.blocker.style.display = 'none';
+    }
+
     private switchPlayingOnce() {
       this.playingOnce = false
     }
 
     public update(delta: number, keysPressed: any) {
+        if (this.lockState) return
+
         const directionPressed = DIRECTIONS.some(key => keysPressed[key] == true)
         let moveY = 0
         let moveX = 0

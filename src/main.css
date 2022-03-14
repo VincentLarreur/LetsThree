@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@200&family=Major+Mono+Display&display=swap');
+
+body {
+  margin: 0px;
+  color: #fff;
+  font-family: 'Exo', sans-serif;
+  line-height: 24px;
+}
+
+h1 {
+  font-family: 'Major Mono Display', monospace;
+  font-size: 100px;
+}
+
+#blocker {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+#instructions {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  font-size: 14px;
+}
