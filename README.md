@@ -21,3 +21,10 @@ You can check out my differents steps using the tags !
   <img src="https://user-images.githubusercontent.com/57709433/157453981-fdc2e4a7-614e-4fb8-92a0-a1de2c626177.gif"/>
   <p>Worked on character controls and passing to typescript envirronment with webpack inspired by <a href="https://github.com/tamani-coding/threejs-character-controls-example">this example</a></p>
 </div>
+
+## Step 3 - Level integration & gravity, pause ![Version](https://img.shields.io/badge/version-0.2.0-yellow)
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/57709433/158251404-2cafc57d-0259-4f5a-ae90-5caea1b199e8.gif"/>
+  <p>Worked on integrating a level and handling gravity, jumping and y collision with Raycaster, finally added a pause menu</p>
+</div>
